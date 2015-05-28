@@ -4,16 +4,16 @@ IS
   'http://jsreportopenshift-cwms.rhcloud.com/api/report';
   --
   G_REP_BLOB BLOB;
-  G_REQUEST_BODY    VARCHAR2(32767);
-  G_REP_type        VARCHAR2(32767);
-  G_REP_format      VARCHAR2(32767);
-  G_REP_orientation VARCHAR2(32767);
+  G_REQUEST_BODY CLOB;
+  G_REP_TYPE        VARCHAR2(32767);
+  G_REP_FORMAT      VARCHAR2(32767);
+  G_REP_ORIENTATION VARCHAR2(32767);
   G_REP_URL         VARCHAR2(32767);
   G_REP_VIEW_AS     VARCHAR2(32767);
   G_REP_FILE_NAME   VARCHAR2(32767);
-  G_REP_header      VARCHAR2(32767);
-  G_REP_footer      VARCHAR2(32767);
-  G_REP_print_delay NUMBER;
+  G_REP_HEADER      VARCHAR2(32767);
+  G_REP_FOOTER      VARCHAR2(32767);
+  G_REP_PRINT_DELAY NUMBER;
   --
   PROCEDURE get_binary_from_ws
   AS
@@ -94,7 +94,9 @@ IS
     l_template.put('phantom', l_phantom);
     l_request_body.put('template', l_template);
     --
-    G_REQUEST_BODY := l_request_body.to_char;
+    G_REQUEST_BODY := empty_clob();
+    dbms_lob.createtemporary(G_REQUEST_BODY, true);
+    l_request_body.to_clob(G_REQUEST_BODY, true);
     --
     -- Call the WS
     get_binary_from_ws;
@@ -104,17 +106,15 @@ IS
     --
   END;
 --
-  PROCEDURE get_jqs_report
+  PROCEDURE get_report
   IS
     l_template JSON;
     l_phantom JSON;
     l_request_body JSON;
     l_html CLOB;
+    l_content json_value;
   BEGIN
-    -- get the html from page to the collection
-    apex_javascript.add_onload_code(p_code =>
-    'clob_set("#apexir_WORKSHEET_REGION");');
-    --
+    -- get the html from the collection
     SELECT
       CLOB001
     INTO
@@ -125,12 +125,11 @@ IS
       collection_name = 'CLOB_CONTENT';
     --
     --
-    l_request_body := json(); --an empty structure
-    l_template     := json();
-    l_phantom      := json();
-    --
-    l_template.put('content', NVL(l_html,' '));
-    --l_phantom.put('url', g_rep_url);
+    l_request_body := JSON(); --an empty structure
+    l_template     := JSON();
+    l_phantom      := JSON();
+    l_content      := json_value(l_html);
+    l_template.put('content', l_content);
     l_phantom.put('header', g_rep_header);
     l_phantom.put('footer', g_rep_footer);
     l_phantom.put('format', g_rep_format);
@@ -139,7 +138,9 @@ IS
     l_template.put('phantom', l_phantom);
     l_request_body.put('template', l_template);
     --
-    G_REQUEST_BODY := l_request_body.to_char;
+    G_REQUEST_BODY := empty_clob();
+    dbms_lob.createtemporary(G_REQUEST_BODY,true);
+    l_request_body.to_clob(G_REQUEST_BODY, true);
     --
     -- Call the WS
     get_binary_from_ws;
@@ -153,24 +154,6 @@ IS
 --
 --
 */
-  PROCEDURE get_report(
-      p_content CLOB DEFAULT NULL,
-      p_url VARCHAR2 DEFAULT NULL)
-  IS
-    l_blob BLOB;
-  BEGIN
-    --
-    -- Initialize the BLOB.
-    DBMS_LOB.createtemporary(l_blob, FALSE);
-    -- Call the WS
-    get_binary_from_ws;
-    -- Download the pdf to the browser
-    wpg_docload.download_file(l_blob);
-    -- Stop page rendering
-    apex_application.stop_apex_engine;
-    -- Relase the resources associated with the temporary LOB.
-    DBMS_LOB.freetemporary(l_blob);
-  END;
 --
 --
   FUNCTION html2pdf(
@@ -178,7 +161,7 @@ IS
       p_plugin  IN apex_plugin.t_plugin )
     RETURN apex_plugin.t_process_exec_result
   IS
-    retval apex_plugin.t_process_exec_result;
+    l_result apex_plugin.t_process_exec_result;
   BEGIN
     G_REP_TYPE        := p_process.attribute_01;
     G_REP_FORMAT      := p_process.attribute_07;
@@ -192,18 +175,28 @@ IS
     --
     IF G_REP_TYPE = 'URL' THEN
       --
-      get_url_report();
+      get_url_report;
       --
-    ELSIF G_REP_TYPE = 'JQS' THEN
+    ELSIF G_REP_TYPE = 'CLOB_CONTENT' THEN
       --
-      get_jqs_report();
+      get_report;
       --
-    ELSIF G_REP_TYPE = 'REPORT' THEN
-      NULL;
     ELSE
       raise_application_error(-20001, G_REP_type || ' not supported!');
     END IF;
-    RETURN retval;
+    --
+    --
+    l_result.success_message := p_process.success_message;
+    RETURN l_result;
+  END;
+--
+  PROCEDURE html2pdfBranch
+  IS
+  BEGIN
+    htp.p('<script>');
+    htp.p('alert("ok")');
+    htp.p('</script>');
+    --raise_application_error(-20001,'ok');
   END;
 --
 END;
