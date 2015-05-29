@@ -15,11 +15,16 @@ IS
   G_REP_FOOTER      VARCHAR2(32767);
   G_REP_PRINT_DELAY NUMBER;
   --
+  --
   PROCEDURE get_binary_from_ws
   AS
     l_http_request UTL_HTTP.req;
     l_http_response UTL_HTTP.resp;
     l_raw RAW(32767);
+    --
+    l_chunkStart  NUMBER := 1;
+    l_chunkData   VARCHAR2(200);
+    l_chunkLength NUMBER := 200;
   BEGIN
     --
     -- Initialize the BLOB.
@@ -28,10 +33,19 @@ IS
     l_http_request := UTL_HTTP.begin_request(G_REPORT_URL, 'POST');
     -- Set header's attributes
     UTL_HTTP.set_header(l_http_request, 'Content-Type', 'application/json');
-    UTL_HTTP.set_header(l_http_request, 'Content-Length', LENGTH(
+    UTL_HTTP.set_header(l_http_request, 'Content-Length', dbms_lob.getlength(
     G_REQUEST_BODY));
     -- Write request body
-    UTL_HTTP.WRITE_TEXT (r => l_http_request, data => G_REQUEST_BODY);
+    --UTL_HTTP.WRITE_TEXT (r => l_http_request, data => G_REQUEST_BODY);
+    LOOP
+      l_chunkData := NULL;
+      l_chunkData := SUBSTR(G_REQUEST_BODY, l_chunkStart, l_chunkLength);
+      UTL_HTTP.write_text(l_http_request, l_chunkData);
+      IF (LENGTH(l_chunkData) < l_chunkLength) THEN
+        EXIT;
+      END IF;
+      l_chunkStart := l_chunkStart + l_chunkLength;
+    END LOOP;
     --
     l_http_response := UTL_HTTP.get_response(l_http_request);
     -- Copy the response into the BLOB.
@@ -44,11 +58,11 @@ IS
     WHEN UTL_HTTP.end_of_body THEN
       UTL_HTTP.end_response(l_http_response);
     END;
-  EXCEPTION
-  WHEN OTHERS THEN
-    UTL_HTTP.end_response(l_http_response);
-    DBMS_LOB.freetemporary(G_REP_BLOB);
-    RAISE;
+    --EXCEPTION
+    --WHEN OTHERS THEN
+    --UTL_HTTP.end_response(l_http_response);
+    --DBMS_LOB.freetemporary(G_REP_BLOB);
+    --RAISE;
   END get_binary_from_ws;
 --
   PROCEDURE download_report
@@ -112,6 +126,7 @@ IS
     l_phantom JSON;
     l_request_body JSON;
     l_html CLOB;
+    l_request CLOB;
     l_content json_value;
   BEGIN
     -- get the html from the collection
@@ -125,11 +140,12 @@ IS
       collection_name = 'CLOB_CONTENT';
     --
     --
+    l_content      := json_value(l_html);
     l_request_body := JSON(); --an empty structure
     l_template     := JSON();
     l_phantom      := JSON();
     l_content      := json_value(l_html);
-    l_template.put('content', l_content);
+    l_template.put('content', L_CONTENT);
     l_phantom.put('header', g_rep_header);
     l_phantom.put('footer', g_rep_footer);
     l_phantom.put('format', g_rep_format);
@@ -138,13 +154,50 @@ IS
     l_template.put('phantom', l_phantom);
     l_request_body.put('template', l_template);
     --
+    INSERT
+    INTO
+      json_test_clob
+      (
+        c
+      )
+      VALUES
+      (
+        l_html
+      );
+    COMMIT;
     G_REQUEST_BODY := empty_clob();
     dbms_lob.createtemporary(G_REQUEST_BODY,true);
-    l_request_body.to_clob(G_REQUEST_BODY, true);
+    l_request_body.to_clob(G_REQUEST_BODY);
+    --
+    /*l_html := empty_clob();
+    dbms_lob.createtemporary(l_html,true);
+    --
+    l_content.to_clob(l_html);
+    --
+    DBMS_LOB.append(G_REQUEST_BODY , '{
+    "template":{
+    "content": "');
+    --DBMS_LOB.append(G_REQUEST_BODY , to_char(dbms_lob.getlength(l_html)));
+    DBMS_LOB.append(G_REQUEST_BODY , l_html);
+    DBMS_LOB.append(G_REQUEST_BODY, ' ",
+    "phantom":{
+    "header":"nag\u0142\u00F3wek z kodowaniem po polsku",
+    "footer":" {#pageNum}/{#numPages} ",
+    "format":"A4",
+    "orientation":"Landscape",
+    "printDelay":0
+    }
+    }
+    }');
+    */
+    --
+    --l_request_body.to_clob(buf => G_REQUEST_BODY, spaces => false,
+    -- chars_per_line => dbms_lob.lobmaxsize, erase_clob => false);
     --
     -- Call the WS
     get_binary_from_ws;
     --
+    dbms_lob.freetemporary(G_REQUEST_BODY);
     -- Download the report to the browser
     download_report;
     --
@@ -156,9 +209,11 @@ IS
 */
 --
 --
-  FUNCTION html2pdf(
+  FUNCTION html2pdf
+    (
       p_process IN apex_plugin.t_process ,
-      p_plugin  IN apex_plugin.t_plugin )
+      p_plugin  IN apex_plugin.t_plugin
+    )
     RETURN apex_plugin.t_process_exec_result
   IS
     l_result apex_plugin.t_process_exec_result;
@@ -188,15 +243,6 @@ IS
     --
     l_result.success_message := p_process.success_message;
     RETURN l_result;
-  END;
---
-  PROCEDURE html2pdfBranch
-  IS
-  BEGIN
-    htp.p('<script>');
-    htp.p('alert("ok")');
-    htp.p('</script>');
-    --raise_application_error(-20001,'ok');
   END;
 --
 END;
