@@ -1,3 +1,5 @@
+apex.widget.waitPopup();
+
 var clobObj = new apex.ajax.clob(  function(p) {    
   if (p.readyState == 4) {
     // upload is done
