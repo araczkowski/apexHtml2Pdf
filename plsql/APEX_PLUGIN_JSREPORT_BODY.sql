@@ -58,11 +58,11 @@ IS
     WHEN UTL_HTTP.end_of_body THEN
       UTL_HTTP.end_response(l_http_response);
     END;
-    --EXCEPTION
-    --WHEN OTHERS THEN
-    --UTL_HTTP.end_response(l_http_response);
-    --DBMS_LOB.freetemporary(G_REP_BLOB);
-    --RAISE;
+  EXCEPTION
+  WHEN OTHERS THEN
+    UTL_HTTP.end_response(l_http_response);
+    DBMS_LOB.freetemporary(G_REP_BLOB);
+    RAISE;
   END get_binary_from_ws;
 --
   PROCEDURE download_report
@@ -126,6 +126,7 @@ IS
     l_phantom JSON;
     l_request_body JSON;
     l_html CLOB;
+    l_content_clob CLOB;
     l_request CLOB;
     l_content json_value;
   BEGIN
@@ -140,11 +141,12 @@ IS
       collection_name = 'CLOB_CONTENT';
     --
     --
-    l_content      := json_value(l_html);
+    l_content_clob := '{#child apex_css}';
+    dbms_lob.append(l_content_clob, l_html);
     l_request_body := JSON(); --an empty structure
     l_template     := JSON();
     l_phantom      := JSON();
-    l_content      := json_value(l_html);
+    l_content      := json_value(l_content_clob);
     l_template.put('content', L_CONTENT);
     l_phantom.put('header', g_rep_header);
     l_phantom.put('footer', g_rep_footer);
@@ -154,42 +156,10 @@ IS
     l_template.put('phantom', l_phantom);
     l_request_body.put('template', l_template);
     --
-    INSERT
-    INTO
-      json_test_clob
-      (
-        c
-      )
-      VALUES
-      (
-        l_html
-      );
-    COMMIT;
     G_REQUEST_BODY := empty_clob();
     dbms_lob.createtemporary(G_REQUEST_BODY,true);
     l_request_body.to_clob(G_REQUEST_BODY);
     --
-    /*l_html := empty_clob();
-    dbms_lob.createtemporary(l_html,true);
-    --
-    l_content.to_clob(l_html);
-    --
-    DBMS_LOB.append(G_REQUEST_BODY , '{
-    "template":{
-    "content": "');
-    --DBMS_LOB.append(G_REQUEST_BODY , to_char(dbms_lob.getlength(l_html)));
-    DBMS_LOB.append(G_REQUEST_BODY , l_html);
-    DBMS_LOB.append(G_REQUEST_BODY, ' ",
-    "phantom":{
-    "header":"nag\u0142\u00F3wek z kodowaniem po polsku",
-    "footer":" {#pageNum}/{#numPages} ",
-    "format":"A4",
-    "orientation":"Landscape",
-    "printDelay":0
-    }
-    }
-    }');
-    */
     --
     --l_request_body.to_clob(buf => G_REQUEST_BODY, spaces => false,
     -- chars_per_line => dbms_lob.lobmaxsize, erase_clob => false);
@@ -209,11 +179,9 @@ IS
 */
 --
 --
-  FUNCTION html2pdf
-    (
+  FUNCTION html2pdf(
       p_process IN apex_plugin.t_process ,
-      p_plugin  IN apex_plugin.t_plugin
-    )
+      p_plugin  IN apex_plugin.t_plugin )
     RETURN apex_plugin.t_process_exec_result
   IS
     l_result apex_plugin.t_process_exec_result;
@@ -246,3 +214,4 @@ IS
   END;
 --
 END;
+
