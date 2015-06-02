@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE BODY apex_plugin_jsreport
 IS
   G_REPORT_URL VARCHAR2(32767) :=
-  'http://jsreportopenshift-cwms.rhcloud.com/api/report';
+  'http://jsreportopenshift-hurtemgo.rhcloud.com/api/report';
   --
   G_REP_BLOB BLOB;
   G_REQUEST_BODY CLOB;
@@ -214,4 +214,3 @@ IS
   END;
 --
 END;
-
