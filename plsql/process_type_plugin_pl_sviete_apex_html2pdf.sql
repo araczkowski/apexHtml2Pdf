@@ -34,6 +34,7 @@ wwv_flow_api.create_plugin(
 ,p_display_name=>'html2pdf'
 ,p_supported_ui_types=>'DESKTOP'
 ,p_execution_function=>'apex_plugin_jsreport.html2pdf'
+,p_standard_attributes=>'REGION'
 ,p_substitute_attributes=>true
 ,p_subscribe_plugin_settings=>true
 ,p_version_identifier=>'1.0'
@@ -64,6 +65,53 @@ wwv_flow_api.create_plugin_attr_value(
 ,p_display_sequence=>20
 ,p_display_value=>'HTML from CLOB_CONTENT connection'
 ,p_return_value=>'CLOB_CONTENT'
+);
+wwv_flow_api.create_plugin_attr_value(
+ p_id=>wwv_flow_api.id(1905391903494263)
+,p_plugin_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_display_sequence=>30
+,p_display_value=>'Template'
+,p_return_value=>'template'
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1903882372439445)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>2
+,p_display_sequence=>20
+,p_prompt=>'Report Server URL'
+,p_attribute_type=>'TEXT'
+,p_is_required=>true
+,p_default_value=>'http://jsreportopenshift-hurtemgo.rhcloud.com/api/report'
+,p_is_translatable=>false
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1906530166580537)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>3
+,p_display_sequence=>30
+,p_prompt=>'Template Short Id'
+,p_attribute_type=>'TEXT'
+,p_is_required=>true
+,p_is_translatable=>false
+,p_depending_on_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_depending_on_condition_type=>'EQUALS'
+,p_depending_on_expression=>'template'
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1908460580674874)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>4
+,p_display_sequence=>40
+,p_prompt=>'Report Data'
+,p_attribute_type=>'TEXTAREA'
+,p_is_required=>true
+,p_is_translatable=>false
+,p_depending_on_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_depending_on_condition_type=>'EQUALS'
+,p_depending_on_expression=>'template'
 );
 wwv_flow_api.create_plugin_attribute(
  p_id=>wwv_flow_api.id(5729931364190491)
