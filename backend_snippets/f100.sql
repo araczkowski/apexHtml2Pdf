@@ -27,7 +27,7 @@ prompt APPLICATION 100 - jsreport
 -- Application Export:
 --   Application:     100
 --   Name:            jsreport
---   Date and Time:   21:42 Monday June 1, 2015
+--   Date and Time:   13:59 Wednesday June 10, 2015
 --   Exported By:     ADMIN
 --   Flashback:       0
 --   Export Type:     Application Export
@@ -105,7 +105,7 @@ wwv_flow_api.create_flow(
 ,p_rejoin_existing_sessions=>'N'
 ,p_csv_encoding=>'Y'
 ,p_last_updated_by=>'ADMIN'
-,p_last_upd_yyyymmddhh24miss=>'20150601212944'
+,p_last_upd_yyyymmddhh24miss=>'20150610113843'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_ui_type_name => null
 );
@@ -7422,6 +7422,7 @@ wwv_flow_api.create_plugin(
 ,p_supported_ui_types=>'DESKTOP'
 ,p_image_prefix => nvl(wwv_flow_application_install.get_static_plugin_file_prefix('PROCESS TYPE','PL.SVIETE.APEX.HTML2PDF'),'')
 ,p_execution_function=>'apex_plugin_jsreport.html2pdf'
+,p_standard_attributes=>'REGION'
 ,p_substitute_attributes=>true
 ,p_subscribe_plugin_settings=>true
 ,p_version_identifier=>'1.0'
@@ -7452,6 +7453,53 @@ wwv_flow_api.create_plugin_attr_value(
 ,p_display_sequence=>20
 ,p_display_value=>'HTML from CLOB_CONTENT connection'
 ,p_return_value=>'CLOB_CONTENT'
+);
+wwv_flow_api.create_plugin_attr_value(
+ p_id=>wwv_flow_api.id(1905391903494263)
+,p_plugin_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_display_sequence=>30
+,p_display_value=>'Template'
+,p_return_value=>'template'
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1903882372439445)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>2
+,p_display_sequence=>20
+,p_prompt=>'Report Server URL'
+,p_attribute_type=>'TEXT'
+,p_is_required=>true
+,p_default_value=>'http://jsreportopenshift-hurtemgo.rhcloud.com/api/report'
+,p_is_translatable=>false
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1906530166580537)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>3
+,p_display_sequence=>30
+,p_prompt=>'Template Short Id'
+,p_attribute_type=>'TEXT'
+,p_is_required=>true
+,p_is_translatable=>false
+,p_depending_on_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_depending_on_condition_type=>'EQUALS'
+,p_depending_on_expression=>'template'
+);
+wwv_flow_api.create_plugin_attribute(
+ p_id=>wwv_flow_api.id(1908460580674874)
+,p_plugin_id=>wwv_flow_api.id(5692521157656991)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>4
+,p_display_sequence=>40
+,p_prompt=>'Report Data'
+,p_attribute_type=>'TEXTAREA'
+,p_is_required=>true
+,p_is_translatable=>false
+,p_depending_on_attribute_id=>wwv_flow_api.id(4270108119306580)
+,p_depending_on_condition_type=>'EQUALS'
+,p_depending_on_expression=>'template'
 );
 wwv_flow_api.create_plugin_attribute(
  p_id=>wwv_flow_api.id(5729931364190491)
@@ -7648,7 +7696,7 @@ wwv_flow_api.create_page(
 ,p_cache_mode=>'NOCACHE'
 ,p_help_text=>'No help is available for this page.'
 ,p_last_updated_by=>'ADMIN'
-,p_last_upd_yyyymmddhh24miss=>'20150601212944'
+,p_last_upd_yyyymmddhh24miss=>'20150610113843'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(1856485148035515)
@@ -7673,24 +7721,40 @@ wwv_flow_api.create_page_plug(
 ,p_plug_display_sequence=>20
 ,p_include_in_reg_disp_sel_yn=>'N'
 ,p_plug_display_point=>'BODY'
-,p_plug_source=>wwv_flow_utilities.join(wwv_flow_t_varchar2(
-'select EMP.ENAME as ENAME,',
-'    EMP.EMPNO as EMPNO,',
-'    EMP.JOB as JOB,',
-'    EMP.MGR as MGR,',
-'    EMP.HIREDATE as HIREDATE,',
-'    EMP.SAL as SAL,',
-'    EMP.COMM as COMM,',
-'    EMP.DEPTNO as DEPTNO,',
-'    DEPT.DNAME as DNAME,',
-'    DEPT.LOC as LOC ',
-' from DEPT DEPT,',
-'    EMP EMP ',
-' where EMP.DEPTNO=DEPT.DEPTNO'))
+,p_plug_source=>'select * from user_objects'
 ,p_plug_source_type=>'NATIVE_IR'
 ,p_plug_query_row_template=>1
 ,p_plug_query_show_nulls_as=>' - '
 ,p_pagination_display_position=>'BOTTOM_RIGHT'
+,p_prn_output_show_link=>'Y'
+,p_prn_content_disposition=>'ATTACHMENT'
+,p_prn_document_header=>'APEX'
+,p_prn_units=>'INCHES'
+,p_prn_paper_size=>'LETTER'
+,p_prn_width=>11
+,p_prn_height=>8.5
+,p_prn_orientation=>'HORIZONTAL'
+,p_prn_page_header_font_color=>'#000000'
+,p_prn_page_header_font_family=>'Helvetica'
+,p_prn_page_header_font_weight=>'normal'
+,p_prn_page_header_font_size=>'12'
+,p_prn_page_footer_font_color=>'#000000'
+,p_prn_page_footer_font_family=>'Helvetica'
+,p_prn_page_footer_font_weight=>'normal'
+,p_prn_page_footer_font_size=>'12'
+,p_prn_header_bg_color=>'#9bafde'
+,p_prn_header_font_color=>'#ffffff'
+,p_prn_header_font_family=>'Helvetica'
+,p_prn_header_font_weight=>'normal'
+,p_prn_header_font_size=>'10'
+,p_prn_body_bg_color=>'#efefef'
+,p_prn_body_font_color=>'#000000'
+,p_prn_body_font_family=>'Helvetica'
+,p_prn_body_font_weight=>'normal'
+,p_prn_body_font_size=>'10'
+,p_prn_border_width=>.5
+,p_prn_page_header_alignment=>'CENTER'
+,p_prn_page_footer_alignment=>'CENTER'
 );
 wwv_flow_api.create_worksheet(
  p_id=>wwv_flow_api.id(1856823666110664)
@@ -7698,107 +7762,145 @@ wwv_flow_api.create_worksheet(
 ,p_max_row_count=>'1000000'
 ,p_max_row_count_message=>'The maximum row count for this report is #MAX_ROW_COUNT# rows.  Please apply a filter to reduce the number of records in your query.'
 ,p_no_data_found_message=>'No data found.'
+,p_allow_report_categories=>'N'
 ,p_show_nulls_as=>'-'
 ,p_pagination_type=>'ROWS_X_TO_Y'
 ,p_pagination_display_pos=>'BOTTOM_RIGHT'
 ,p_report_list_mode=>'TABS'
 ,p_show_detail_link=>'N'
+,p_show_calendar=>'N'
 ,p_download_formats=>'CSV:HTML:EMAIL:XLS:PDF:RTF'
+,p_detail_link_text=>'<img src="#IMAGE_PREFIX#menu/pencil16x16.gif" alt="" />'
+,p_icon_view_columns_per_row=>1
 ,p_owner=>'ADMIN'
 ,p_internal_uid=>1856823666110664
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1857130125110666)
-,p_db_column_name=>'ENAME'
-,p_display_order=>1
-,p_column_identifier=>'A'
-,p_column_label=>'Ename'
-,p_column_type=>'STRING'
-,p_tz_dependent=>'N'
-);
-wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1857504018110667)
-,p_db_column_name=>'EMPNO'
+ p_id=>wwv_flow_api.id(1881079848797452)
+,p_db_column_name=>'OBJECT_NAME'
 ,p_display_order=>2
 ,p_column_identifier=>'B'
-,p_column_label=>'Empno'
-,p_column_type=>'NUMBER'
-,p_column_alignment=>'RIGHT'
-,p_tz_dependent=>'N'
-);
-wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1857932134110667)
-,p_db_column_name=>'JOB'
-,p_display_order=>3
-,p_column_identifier=>'C'
-,p_column_label=>'Job'
+,p_column_label=>'Object Name'
 ,p_column_type=>'STRING'
 ,p_tz_dependent=>'N'
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1858307534110667)
-,p_db_column_name=>'MGR'
+ p_id=>wwv_flow_api.id(1881703302797452)
+,p_db_column_name=>'SUBOBJECT_NAME'
+,p_display_order=>3
+,p_column_identifier=>'C'
+,p_column_label=>'Subobject Name'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1882443100797452)
+,p_db_column_name=>'OBJECT_ID'
 ,p_display_order=>4
 ,p_column_identifier=>'D'
-,p_column_label=>'Mgr'
+,p_column_label=>'Object Id'
 ,p_column_type=>'NUMBER'
 ,p_column_alignment=>'RIGHT'
 ,p_tz_dependent=>'N'
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1858703554110668)
-,p_db_column_name=>'HIREDATE'
+ p_id=>wwv_flow_api.id(1883126364797453)
+,p_db_column_name=>'DATA_OBJECT_ID'
 ,p_display_order=>5
 ,p_column_identifier=>'E'
-,p_column_label=>'Hiredate'
+,p_column_label=>'Data Object Id'
+,p_column_type=>'NUMBER'
+,p_column_alignment=>'RIGHT'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1883816770797453)
+,p_db_column_name=>'OBJECT_TYPE'
+,p_display_order=>6
+,p_column_identifier=>'F'
+,p_column_label=>'Object Type'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1884530597797454)
+,p_db_column_name=>'CREATED'
+,p_display_order=>7
+,p_column_identifier=>'G'
+,p_column_label=>'Created'
 ,p_column_type=>'DATE'
 ,p_tz_dependent=>'N'
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1859187951110668)
-,p_db_column_name=>'SAL'
-,p_display_order=>6
-,p_column_identifier=>'F'
-,p_column_label=>'Sal'
-,p_column_type=>'NUMBER'
-,p_column_alignment=>'RIGHT'
-,p_tz_dependent=>'N'
-);
-wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1859566093110668)
-,p_db_column_name=>'COMM'
-,p_display_order=>7
-,p_column_identifier=>'G'
-,p_column_label=>'Comm'
-,p_column_type=>'NUMBER'
-,p_column_alignment=>'RIGHT'
-,p_tz_dependent=>'N'
-);
-wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1859983464110668)
-,p_db_column_name=>'DEPTNO'
+ p_id=>wwv_flow_api.id(1885227595797454)
+,p_db_column_name=>'LAST_DDL_TIME'
 ,p_display_order=>8
 ,p_column_identifier=>'H'
-,p_column_label=>'Deptno'
-,p_column_type=>'NUMBER'
-,p_column_alignment=>'RIGHT'
+,p_column_label=>'Last Ddl Time'
+,p_column_type=>'DATE'
 ,p_tz_dependent=>'N'
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1860344476110668)
-,p_db_column_name=>'DNAME'
+ p_id=>wwv_flow_api.id(1885919863797455)
+,p_db_column_name=>'TIMESTAMP'
 ,p_display_order=>9
 ,p_column_identifier=>'I'
-,p_column_label=>'Dname'
+,p_column_label=>'Timestamp'
 ,p_column_type=>'STRING'
 ,p_tz_dependent=>'N'
 );
 wwv_flow_api.create_worksheet_column(
- p_id=>wwv_flow_api.id(1860750538110669)
-,p_db_column_name=>'LOC'
+ p_id=>wwv_flow_api.id(1886651793797455)
+,p_db_column_name=>'STATUS'
 ,p_display_order=>10
 ,p_column_identifier=>'J'
-,p_column_label=>'Loc'
+,p_column_label=>'Status'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1887347762797456)
+,p_db_column_name=>'TEMPORARY'
+,p_display_order=>11
+,p_column_identifier=>'K'
+,p_column_label=>'Temporary'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1888010631797456)
+,p_db_column_name=>'GENERATED'
+,p_display_order=>12
+,p_column_identifier=>'L'
+,p_column_label=>'Generated'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1888733210797456)
+,p_db_column_name=>'SECONDARY'
+,p_display_order=>13
+,p_column_identifier=>'M'
+,p_column_label=>'Secondary'
+,p_column_type=>'STRING'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1889435327797456)
+,p_db_column_name=>'NAMESPACE'
+,p_display_order=>14
+,p_column_identifier=>'N'
+,p_column_label=>'Namespace'
+,p_column_type=>'NUMBER'
+,p_column_alignment=>'RIGHT'
+,p_tz_dependent=>'N'
+);
+wwv_flow_api.create_worksheet_column(
+ p_id=>wwv_flow_api.id(1890103397797457)
+,p_db_column_name=>'EDITION_NAME'
+,p_display_order=>15
+,p_column_identifier=>'O'
+,p_column_label=>'Edition Name'
 ,p_column_type=>'STRING'
 ,p_tz_dependent=>'N'
 );
@@ -7809,8 +7911,8 @@ wwv_flow_api.create_worksheet_rpt(
 ,p_report_alias=>'18612'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
-,p_display_rows=>50
-,p_report_columns=>'ENAME:EMPNO:JOB:MGR:HIREDATE:SAL:COMM:DEPTNO:DNAME:LOC'
+,p_display_rows=>5
+,p_report_columns=>'OBJECT_NAME:SUBOBJECT_NAME:OBJECT_ID:DATA_OBJECT_ID:OBJECT_TYPE:CREATED:LAST_DDL_TIME:TIMESTAMP:STATUS:TEMPORARY:GENERATED:SECONDARY:NAMESPACE:EDITION_NAME'
 ,p_flashback_enabled=>'N'
 );
 wwv_flow_api.create_page_button(
@@ -7859,10 +7961,12 @@ wwv_flow_api.create_page_da_action(
 ,p_affected_elements_type=>'JQUERY_SELECTOR'
 ,p_affected_elements=>'window'
 ,p_attribute_01=>wwv_flow_utilities.join(wwv_flow_t_varchar2(
+'apex.widget.waitPopup();',
+'',
 'var clobObj = new apex.ajax.clob(  function(p) {    ',
 '  if (p.readyState == 4) {',
 '    // upload is done',
-'    apex.submit(''HTML2PDF'');    ',
+'    apex.submit(''HTML2PDF''); ',
 '  }  ',
 '});  ',
 'var html = $(''#JSREPORT_ID > div'').html();',
@@ -7876,6 +7980,7 @@ wwv_flow_api.create_page_process(
 ,p_process_type=>'PLUGIN_PL.SVIETE.APEX.HTML2PDF'
 ,p_process_name=>'html2pdf'
 ,p_attribute_01=>'CLOB_CONTENT'
+,p_attribute_02=>'http://jsreportopenshift-hurtemgo.rhcloud.com//api/report'
 ,p_attribute_07=>'A4'
 ,p_attribute_08=>'Landscape'
 ,p_attribute_09=>'report.pdf'

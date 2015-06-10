@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE apex_plugin_jsreport
+create or replace PACKAGE apex_plugin_jsreport
 IS
   --
   FUNCTION html2pdf(
