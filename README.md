@@ -2,4 +2,4 @@
 
 a new solution to for the reporting in Oracle APEX
 
-[![jsreport in Oracle APEX ](http://img.youtube.com/vi/uYkCV06fhwo/0.jpg)](http://www.youtube.com/watch?v=uYkCV06fhwo)
+[![jsreport in Oracle APEX ](http://img.youtube.com/vi/BIJZG6dx1z4/0.jpg)](http://www.youtube.com/watch?v=BIJZG6dx1z4)

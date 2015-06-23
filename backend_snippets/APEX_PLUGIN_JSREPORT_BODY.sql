@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY apex_plugin_jsreport
+create or replace PACKAGE BODY apex_plugin_jsreport
 IS
   G_REPORT_SERVER_URL VARCHAR2(32767);
   G_REP_BLOB BLOB;
@@ -141,12 +141,14 @@ IS
       collection_name = 'CLOB_CONTENT';
     --
     --
+    --l_content_clob := '{#child apex_css} <img src=''https://raw.githubusercontent.com/araczkowski/apexHtml2Pdf/master/frontend_snippets/logo.png'' style="display: none;">';
     l_content_clob := '{#child apex_css}';
     dbms_lob.append(l_content_clob, l_html);
     l_request_body := JSON(); --an empty structure
     l_template     := JSON();
     l_phantom      := JSON();
     l_content      := json_value(l_content_clob);
+
     l_template.put('content', L_CONTENT);
     l_phantom.put('header', g_rep_header);
     l_phantom.put('footer', g_rep_footer);
@@ -256,3 +258,4 @@ IS
   END;
 --
 END;
+/
