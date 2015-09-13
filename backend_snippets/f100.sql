@@ -27,7 +27,7 @@ prompt APPLICATION 100 - jsreport
 -- Application Export:
 --   Application:     100
 --   Name:            jsreport
---   Date and Time:   13:59 Wednesday June 10, 2015
+--   Date and Time:   07:38 Wednesday June 24, 2015
 --   Exported By:     ADMIN
 --   Flashback:       0
 --   Export Type:     Application Export
@@ -36,10 +36,12 @@ prompt APPLICATION 100 - jsreport
 --
 
 -- Application Statistics:
---   Pages:                      1
---     Processes:                1
---     Regions:                  2
---     Buttons:                  1
+--   Pages:                      2
+--     Items:                    3
+--     Computations:             1
+--     Processes:                2
+--     Regions:                  3
+--     Buttons:                  2
 --     Dynamic Actions:          1
 --   Shared Components:
 --     Logic:
@@ -105,7 +107,7 @@ wwv_flow_api.create_flow(
 ,p_rejoin_existing_sessions=>'N'
 ,p_csv_encoding=>'Y'
 ,p_last_updated_by=>'ADMIN'
-,p_last_upd_yyyymmddhh24miss=>'20150610113843'
+,p_last_upd_yyyymmddhh24miss=>'20150623090125'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_ui_type_name => null
 );
@@ -125,6 +127,14 @@ wwv_flow_api.create_list_item(
 ,p_list_item_link_target=>'f?p=&APP_ID.:1:&APP_SESSION.::&DEBUG.:'
 ,p_list_item_current_type=>'COLON_DELIMITED_PAGE_LIST'
 ,p_list_item_current_for_pages=>'1'
+);
+wwv_flow_api.create_list_item(
+ p_id=>wwv_flow_api.id(2005167021210540)
+,p_list_item_display_sequence=>20
+,p_list_item_link_text=>'Demo 1 - package tracker and reporter'
+,p_list_item_link_target=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.'
+,p_list_item_current_type=>'COLON_DELIMITED_PAGE_LIST'
+,p_list_item_current_for_pages=>'2'
 );
 wwv_flow_api.create_list(
  p_id=>wwv_flow_api.id(1855553216035510)
@@ -7696,7 +7706,7 @@ wwv_flow_api.create_page(
 ,p_cache_mode=>'NOCACHE'
 ,p_help_text=>'No help is available for this page.'
 ,p_last_updated_by=>'ADMIN'
-,p_last_upd_yyyymmddhh24miss=>'20150610113843'
+,p_last_upd_yyyymmddhh24miss=>'20150623090125'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(1856485148035515)
@@ -7908,12 +7918,18 @@ wwv_flow_api.create_worksheet_rpt(
  p_id=>wwv_flow_api.id(1861139697111531)
 ,p_application_user=>'APXWS_DEFAULT'
 ,p_report_seq=>10
+,p_report_type=>'CHART'
 ,p_report_alias=>'18612'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
 ,p_display_rows=>5
-,p_report_columns=>'OBJECT_NAME:SUBOBJECT_NAME:OBJECT_ID:DATA_OBJECT_ID:OBJECT_TYPE:CREATED:LAST_DDL_TIME:TIMESTAMP:STATUS:TEMPORARY:GENERATED:SECONDARY:NAMESPACE:EDITION_NAME'
+,p_report_columns=>'OBJECT_NAME:OBJECT_ID:DATA_OBJECT_ID:OBJECT_TYPE:CREATED:LAST_DDL_TIME:TIMESTAMP:STATUS:TEMPORARY:GENERATED:SECONDARY:NAMESPACE'
 ,p_flashback_enabled=>'N'
+,p_chart_type=>'HCOLUMN'
+,p_chart_label_column=>'OBJECT_TYPE'
+,p_chart_value_column=>'OBJECT_ID'
+,p_chart_aggregate=>'SUM'
+,p_chart_sorting=>'DEFAULT'
 );
 wwv_flow_api.create_page_button(
  p_id=>wwv_flow_api.id(1861632966130814)
@@ -7969,7 +7985,8 @@ wwv_flow_api.create_page_da_action(
 '    apex.submit(''HTML2PDF''); ',
 '  }  ',
 '});  ',
-'var html = $(''#JSREPORT_ID > div'').html();',
+'//var html = $(''#JSREPORT_ID > div'').html();',
+'var html = $(''#JSREPORT_ID_chart, #JSREPORT_ID_data_panel'').attr(''style'',"border: 2px solid red;").html();',
 'clobObj._set(html);'))
 ,p_stop_execution_on_error=>'Y'
 );
@@ -7990,6 +8007,153 @@ wwv_flow_api.create_page_process(
 ,p_attribute_14=>'footer with polish words: ąłżźęó'
 ,p_process_when=>'GETTHEPDF'
 ,p_process_when_type=>'REQUEST_EQUALS_CONDITION'
+);
+end;
+/
+prompt --application/pages/page_00002
+begin
+wwv_flow_api.create_page(
+ p_id=>2
+,p_user_interface_id=>wwv_flow_api.id(1855643450035511)
+,p_name=>'Demo 1 - package tracker and reporter'
+,p_page_mode=>'NORMAL'
+,p_step_title=>'Demo 1 - package tracker and reporter'
+,p_step_sub_title_type=>'TEXT_WITH_SUBSTITUTIONS'
+,p_first_item=>'NO_FIRST_ITEM'
+,p_page_template_options=>'#DEFAULT#'
+,p_dialog_chained=>'Y'
+,p_overwrite_navigation_list=>'N'
+,p_page_is_public_y_n=>'N'
+,p_cache_mode=>'NOCACHE'
+,p_help_text=>'No help is available for this page.'
+,p_last_updated_by=>'ADMIN'
+,p_last_upd_yyyymmddhh24miss=>'20150616110133'
+);
+wwv_flow_api.create_page_plug(
+ p_id=>wwv_flow_api.id(2005587828216126)
+,p_plug_name=>'Package Tracker and Reporter'
+,p_region_template_options=>'#DEFAULT#'
+,p_escape_on_http_output=>'Y'
+,p_plug_template=>wwv_flow_api.id(1829494193035496)
+,p_plug_display_sequence=>10
+,p_include_in_reg_disp_sel_yn=>'N'
+,p_plug_display_point=>'BODY'
+,p_plug_query_row_template=>1
+,p_plug_query_num_rows=>15
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+,p_attribute_03=>'Y'
+);
+wwv_flow_api.create_page_button(
+ p_id=>wwv_flow_api.id(2010620332193126)
+,p_button_sequence=>5
+,p_button_plug_id=>wwv_flow_api.id(2005587828216126)
+,p_button_name=>'P2_GENERATE_REPORT'
+,p_button_static_id=>'P2_GENERATE_REPORT'
+,p_button_action=>'SUBMIT'
+,p_button_template_options=>'t-Button--iconRight:t-Button--large:t-Button--primary:t-Button--pillStart:t-Button--stretch'
+,p_button_template_id=>wwv_flow_api.id(1850583098035504)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Generate Report'
+,p_button_position=>'REGION_TEMPLATE_CREATE'
+,p_icon_css_classes=>'fa-search-plus'
+,p_grid_new_grid=>false
+,p_grid_new_row=>'N'
+,p_grid_new_column=>'Y'
+);
+wwv_flow_api.create_page_branch(
+ p_id=>wwv_flow_api.id(2008511399312631)
+,p_branch_name=>'2'
+,p_branch_action=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:::'
+,p_branch_point=>'AFTER_PROCESSING'
+,p_branch_type=>'REDIRECT_URL'
+,p_branch_sequence=>10
+);
+wwv_flow_api.create_page_item(
+ p_id=>wwv_flow_api.id(2006736342269569)
+,p_name=>'P2_CARRIER'
+,p_is_required=>true
+,p_item_sequence=>1
+,p_item_plug_id=>wwv_flow_api.id(2005587828216126)
+,p_prompt=>'Carrier'
+,p_display_as=>'NATIVE_SELECT_LIST'
+,p_lov=>'STATIC2:DPD;https://tracktrace.dpd.com.pl/EN/parcelDetails?typ=1&p1=,FedEx;https://poland.fedex.com/domestic-shipping/pub/tracktrace.do?packageId=,K-EX;http://kurier.k-ex.pl/tnt_szczegoly.php?nr='
+,p_cSize=>30
+,p_cMaxlength=>4000
+,p_cHeight=>1
+,p_label_alignment=>'RIGHT'
+,p_field_alignment=>'LEFT-CENTER'
+,p_field_template=>wwv_flow_api.id(1849912712035504)
+,p_item_template_options=>'#DEFAULT#:t-Form-fieldContainer--xlarge'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'NONE'
+,p_attribute_02=>'N'
+);
+wwv_flow_api.create_page_item(
+ p_id=>wwv_flow_api.id(2007048097274674)
+,p_name=>'P2_TRACKING_NUMBER'
+,p_is_required=>true
+,p_item_sequence=>5
+,p_item_plug_id=>wwv_flow_api.id(2005587828216126)
+,p_prompt=>'Package'
+,p_display_as=>'NATIVE_TEXT_FIELD'
+,p_cSize=>30
+,p_cMaxlength=>4000
+,p_cHeight=>1
+,p_label_alignment=>'RIGHT'
+,p_field_alignment=>'LEFT-CENTER'
+,p_field_template=>wwv_flow_api.id(1850130343035504)
+,p_item_template_options=>'#DEFAULT#:t-Form-fieldContainer--xlarge'
+,p_lov_display_extra=>'YES'
+,p_attribute_01=>'N'
+,p_attribute_02=>'N'
+,p_attribute_04=>'TEXT'
+,p_attribute_05=>'BOTH'
+);
+wwv_flow_api.create_page_item(
+ p_id=>wwv_flow_api.id(2010024389172200)
+,p_name=>'P2_TIME'
+,p_item_sequence=>20
+,p_item_plug_id=>wwv_flow_api.id(2005587828216126)
+,p_use_cache_before_default=>'NO'
+,p_source=>'to_char(sysdate, ''YYYY-MM-DD hh24:mi:ss'')'
+,p_source_type=>'FUNCTION'
+,p_display_as=>'NATIVE_HIDDEN'
+,p_cSize=>30
+,p_cMaxlength=>4000
+,p_cHeight=>1
+,p_label_alignment=>'RIGHT'
+,p_field_alignment=>'LEFT-CENTER'
+,p_item_template_options=>'#DEFAULT#'
+,p_lov_display_extra=>'YES'
+,p_attribute_01=>'Y'
+);
+wwv_flow_api.create_page_computation(
+ p_id=>wwv_flow_api.id(2014278454262189)
+,p_computation_sequence=>10
+,p_computation_item=>'P2_TIME'
+,p_computation_point=>'BEFORE_HEADER'
+,p_computation_type=>'PLSQL_EXPRESSION'
+,p_computation=>'to_char(sysdate, ''YYYY-MM-DD hh24:mi:ss'')'
+);
+wwv_flow_api.create_page_process(
+ p_id=>wwv_flow_api.id(2006325711248438)
+,p_process_sequence=>10
+,p_process_point=>'AFTER_SUBMIT'
+,p_process_type=>'PLUGIN_PL.SVIETE.APEX.HTML2PDF'
+,p_process_name=>'html2pdf'
+,p_attribute_01=>'URL'
+,p_attribute_02=>'http://jsreportopenshift-hurtemgo.rhcloud.com/api/report'
+,p_attribute_07=>'A4'
+,p_attribute_08=>'Portrait'
+,p_attribute_09=>'report.pdf'
+,p_attribute_10=>'&P2_CARRIER.&P2_TRACKING_NUMBER.'
+,p_attribute_11=>'inline'
+,p_attribute_12=>'0'
+,p_attribute_13=>'<h3>Info about package: &P2_TRACKING_NUMBER.</h3>'
+,p_attribute_14=>'Sviete &P2_TIME.'
+,p_error_display_location=>'INLINE_IN_NOTIFICATION'
+,p_process_when_button_id=>wwv_flow_api.id(2010620332193126)
 );
 end;
 /
